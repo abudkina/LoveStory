@@ -50,7 +50,7 @@ export default function LoveStoryView({ story, showShare = true }: LoveStoryView
               })}
             </span>
           </div>
-          <div className="hero-badge text-sm sm:text-base">
+          <div className="hero-badge-light text-sm sm:text-base">
             <span>💕</span>
             <span>
               {story.stats.daysTogether.toLocaleString("ru-RU")} дней вместе

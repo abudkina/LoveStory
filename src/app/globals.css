@@ -25,6 +25,7 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -65,6 +66,24 @@ body {
   inset: 0;
   background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
   pointer-events: none;
+}
+
+.mesh-hero-to-light::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 7rem;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(26, 10, 46, 0.35) 35%,
+    rgba(255, 240, 245, 0.85) 75%,
+    #fff0f5 100%
+  );
+  pointer-events: none;
+  z-index: 1;
 }
 
 @keyframes mesh-shift {

@@ -48,12 +48,12 @@ export default function Header({ user }: HeaderProps) {
               )}
               {user ? (
                 <>
-                  <Link
+                  <a
                     href="/dashboard"
                     className="text-white/70 hover:text-white font-medium transition-colors text-sm"
                   >
                     Кабинет
-                  </Link>
+                  </a>
                   <span className="text-white/50 text-sm max-w-[120px] truncate">{user.name}</span>
                   <button
                     onClick={() => {
@@ -105,13 +105,13 @@ export default function Header({ user }: HeaderProps) {
             {user ? (
               <>
                 <p className="px-4 py-2 text-sm text-violet-500 truncate">{user.name}</p>
-                <Link
+                <a
                   href="/dashboard"
                   onClick={closeMenu}
                   className="block px-4 py-3 rounded-xl text-slate-800 hover:bg-pink-50 font-medium"
                 >
                   Личный кабинет
-                </Link>
+                </a>
                 <button
                   onClick={() => {
                     logout();

@@ -61,12 +61,22 @@ export async function collectFilesFromDirectoryHandle(
 ): Promise<File[]> {
   const files: File[] = [];
 
-  for await (const [name, handle] of dirHandle.entries()) {
+  for await (const name of dirHandle.keys()) {
     const path = prefix ? `${prefix}/${name}` : name;
+    const handle = await dirHandle
+      .getFileHandle(name)
+      .catch(() => dirHandle.getDirectoryHandle(name));
     if (handle.kind === "file") {
-      files.push(withRelativePath(await handle.getFile(), path));
+      files.push(
+        withRelativePath(await (handle as FileSystemFileHandle).getFile(), path)
+      );
     } else {
-      files.push(...(await collectFilesFromDirectoryHandle(handle, path)));
+      files.push(
+        ...(await collectFilesFromDirectoryHandle(
+          handle as FileSystemDirectoryHandle,
+          path
+        ))
+      );
     }
   }
 

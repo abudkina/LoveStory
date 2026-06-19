@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import FloatingHearts from "@/components/FloatingHearts";
 import AuthForm from "@/components/AuthForm";
@@ -128,17 +127,19 @@ const PERKS = [
 ];
 
 export default function LandingPage() {
-  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
+  const [sessionChecked, setSessionChecked] = useState(false);
 
   useEffect(() => {
     setUser(getSession());
+    setSessionChecked(true);
   }, []);
 
-  const handleAuthSuccess = (u: User) => {
-    setUser(u);
-    router.push("/dashboard");
+  const handleAuthSuccess = () => {
+    window.location.href = "/dashboard";
   };
+
+  const startHref = user ? "/dashboard" : "#auth";
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -171,10 +172,10 @@ export default function LandingPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mt-10">
                 <a
-                  href="#auth"
+                  href={startHref}
                   className="btn-glow inline-flex items-center justify-center px-8 py-4 rounded-2xl font-bold text-base"
                 >
-                  Начать бесплатно ✦
+                  {user ? "В кабинет ✦" : "Начать бесплатно ✦"}
                 </a>
                 <a
                   href="#features"
@@ -408,8 +409,8 @@ export default function LandingPage() {
           </section>
 
           {/* CTA */}
-          <section className="py-20 sm:py-24 relative overflow-hidden">
-            <div className="absolute inset-0 cta-banner opacity-10" />
+          <section className="py-20 sm:py-24 bg-white relative overflow-hidden">
+            <div className="absolute inset-0 grid-dots opacity-30" />
             <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center relative">
               <h2 className="font-display text-3xl sm:text-5xl font-bold text-slate-900 mb-4">
                 Готовы рассказать{" "}
@@ -419,10 +420,10 @@ export default function LandingPage() {
                 Создайте love story за несколько минут. Без технических знаний.
               </p>
               <a
-                href="#auth"
+                href={startHref}
                 className="btn-glow inline-block px-12 py-4 rounded-2xl font-bold text-lg"
               >
-                Начать сейчас ✦
+                {user ? "В кабинет ✦" : "Начать сейчас ✦"}
               </a>
             </div>
           </section>
@@ -459,7 +460,29 @@ export default function LandingPage() {
                 </ul>
               </div>
               <div className="flex justify-center">
-                <AuthForm onSuccess={handleAuthSuccess} />
+                {!sessionChecked ? (
+                  <div className="landing-card-dark rounded-3xl p-6 sm:p-8 w-full max-w-md flex items-center justify-center min-h-[320px]">
+                    <div className="text-4xl animate-pulse">💕</div>
+                  </div>
+                ) : user ? (
+                  <div className="landing-card-dark rounded-3xl p-6 sm:p-8 w-full max-w-md text-center">
+                    <span className="text-5xl inline-block animate-float">💕</span>
+                    <h2 className="font-display text-2xl text-white mt-4">
+                      С возвращением, {user.name}!
+                    </h2>
+                    <p className="text-white/50 text-sm mt-2 mb-8">
+                      Продолжите создавать вашу love story
+                    </p>
+                    <a
+                      href="/dashboard"
+                      className="btn-glow inline-block w-full py-3.5 rounded-xl font-bold text-base"
+                    >
+                      Перейти в кабинет ✦
+                    </a>
+                  </div>
+                ) : (
+                  <AuthForm initialMode="register" onSuccess={handleAuthSuccess} />
+                )}
               </div>
             </div>
           </section>

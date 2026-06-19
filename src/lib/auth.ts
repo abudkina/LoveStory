@@ -29,6 +29,10 @@ export function register(
     return { success: false, error: "Пароль должен быть не менее 6 символов" };
   }
 
+  if (!name.trim()) {
+    return { success: false, error: "Укажите имя" };
+  }
+
   const user: User = {
     id: crypto.randomUUID(),
     email: normalizedEmail,

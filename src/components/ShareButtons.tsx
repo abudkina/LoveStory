@@ -97,7 +97,7 @@ export default function ShareButtons({ story }: ShareButtonsProps) {
 
           <button
             onClick={handleCopyLink}
-            className="btn-secondary py-3.5 sm:py-3 px-4 rounded-xl text-sm font-medium flex items-center justify-center gap-2 min-h-[48px]"
+            className="btn-secondary-light py-3.5 sm:py-3 px-4 rounded-xl text-sm font-medium flex items-center justify-center gap-2 min-h-[48px]"
           >
             <span>{copied ? "✅" : "🔗"}</span>
             {copied ? "Скопировано!" : "Копировать"}
@@ -105,28 +105,28 @@ export default function ShareButtons({ story }: ShareButtonsProps) {
 
           <button
             onClick={handleTelegramShare}
-            className="btn-secondary py-3.5 sm:py-3 px-4 rounded-xl text-sm font-medium flex items-center justify-center gap-2 min-h-[48px]"
+            className="btn-secondary-light py-3.5 sm:py-3 px-4 rounded-xl text-sm font-medium flex items-center justify-center gap-2 min-h-[48px]"
           >
             <span>✈️</span> Telegram
           </button>
 
           <button
             onClick={handleWhatsAppShare}
-            className="btn-secondary py-3.5 sm:py-3 px-4 rounded-xl text-sm font-medium flex items-center justify-center gap-2 min-h-[48px]"
+            className="btn-secondary-light py-3.5 sm:py-3 px-4 rounded-xl text-sm font-medium flex items-center justify-center gap-2 min-h-[48px]"
           >
             <span>💬</span> WhatsApp
           </button>
 
           <button
             onClick={handleDownloadHtml}
-            className="btn-secondary py-3.5 sm:py-3 px-4 rounded-xl text-sm font-medium flex items-center justify-center gap-2 min-h-[48px]"
+            className="btn-secondary-light py-3.5 sm:py-3 px-4 rounded-xl text-sm font-medium flex items-center justify-center gap-2 min-h-[48px]"
           >
             <span>📄</span> Скачать HTML
           </button>
 
           <button
             onClick={handlePrint}
-            className="btn-secondary py-3.5 sm:py-3 px-4 rounded-xl text-sm font-medium flex items-center justify-center gap-2 min-h-[48px]"
+            className="btn-secondary-light py-3.5 sm:py-3 px-4 rounded-xl text-sm font-medium flex items-center justify-center gap-2 min-h-[48px]"
           >
             <span>🖨️</span> Печать
           </button>

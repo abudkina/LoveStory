@@ -52,7 +52,7 @@ export default function MobileShareBar({ story }: MobileShareBarProps) {
         </button>
         <a
           href="#share-full"
-          className="btn-secondary px-4 py-3 rounded-xl text-sm font-medium flex items-center justify-center"
+          className="btn-secondary-light px-4 py-3 rounded-xl text-sm font-medium flex items-center justify-center"
         >
           Ещё
         </a>

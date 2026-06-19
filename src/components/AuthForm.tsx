@@ -6,10 +6,11 @@ import { User } from "@/types";
 
 interface AuthFormProps {
   onSuccess: (user: User) => void;
+  initialMode?: "login" | "register";
 }
 
-export default function AuthForm({ onSuccess }: AuthFormProps) {
-  const [mode, setMode] = useState<"login" | "register">("login");
+export default function AuthForm({ onSuccess, initialMode = "login" }: AuthFormProps) {
+  const [mode, setMode] = useState<"login" | "register">(initialMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -30,9 +31,9 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
 
     if (result.success && result.user) {
       onSuccess(result.user);
-    } else {
-      setError(result.error || "Ошибка");
+      return;
     }
+    setError(result.error || "Ошибка");
   };
 
   return (

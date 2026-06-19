@@ -39,7 +39,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const session = getSession();
     if (!session) {
-      router.push("/#auth");
+      window.location.href = "/#auth";
       return;
     }
     setUser(session);
@@ -49,7 +49,7 @@ export default function DashboardPage() {
 
   const handleStoryCreated = (story: StoredStory) => {
     setStories((prev) => [story, ...prev]);
-    router.push(`/story/${story.id}`);
+    router.push(`/story?id=${story.id}`);
   };
 
   const handleDelete = (id: string) => {
@@ -72,15 +72,15 @@ export default function DashboardPage() {
     <>
       <Header user={user} />
 
-      <main className="min-h-screen overflow-x-hidden">
+      <main className="min-h-screen">
         {/* Hero */}
-        <section className="relative mesh-hero mesh-animated pt-10 pb-16 sm:pt-14 sm:pb-20 overflow-hidden">
+        <section className="relative mesh-hero mesh-hero-to-light mesh-animated pt-10 pb-20 sm:pt-14 sm:pb-24 overflow-hidden">
           <div className="aurora-orb w-72 h-72 bg-pink-500/25 top-0 left-[10%]" />
           <div className="aurora-orb w-80 h-80 bg-violet-600/20 top-10 right-[5%]" style={{ animationDelay: "2s" }} />
           <div className="absolute inset-0 grid-dots opacity-30" />
           <FloatingHearts />
 
-          <div className="relative max-w-2xl mx-auto px-4 sm:px-6 text-center page-enter">
+          <div className="relative z-10 max-w-2xl mx-auto px-4 sm:px-6 text-center page-enter">
             <span className="hero-badge mb-5 inline-flex">✦ Личный кабинет ✦</span>
             <h1 className="text-4xl sm:text-5xl font-display font-bold text-white mb-3 text-glow">
               Привет,{" "}
@@ -112,7 +112,7 @@ export default function DashboardPage() {
         </section>
 
         {/* Steps */}
-        <section className="relative section-mesh py-14 sm:py-20">
+        <section className="relative section-mesh -mt-12 sm:-mt-16 pt-20 sm:pt-24 pb-14 sm:pb-20">
           <div className="absolute inset-0 heart-pattern opacity-60 pointer-events-none" />
           <div className="aurora-orb w-64 h-64 bg-pink-400/15 bottom-0 left-[0%]" />
 
@@ -207,7 +207,7 @@ export default function DashboardPage() {
                           <div className="relative z-10 flex gap-2 shrink-0">
                             <button
                               type="button"
-                              onClick={() => router.push(`/story/${story.id}`)}
+                              onClick={() => router.push(`/story?id=${story.id}`)}
                               className="flex-1 sm:flex-none text-center px-5 py-2.5 rounded-xl btn-glow font-semibold text-sm"
                             >
                               Открыть ✦
