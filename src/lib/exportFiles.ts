@@ -61,7 +61,7 @@ export async function collectFilesFromDirectoryHandle(
 ): Promise<File[]> {
   const files: File[] = [];
 
-  for await (const [name, handle] of dirHandle as AsyncIterable<
+  for await (const [name, handle] of dirHandle as unknown as AsyncIterable<
     [string, FileSystemHandle]
   >) {
     const path = prefix ? `${prefix}/${name}` : name;
