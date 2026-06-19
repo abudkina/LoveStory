@@ -22,7 +22,7 @@ export default function Header({ user }: HeaderProps) {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
           <nav className="flex items-center justify-between h-16 md:h-[4.5rem]">
             <Link
-              href="/"
+              href={withBasePath("/")}
               className="font-display text-xl md:text-2xl font-bold min-w-0 truncate group"
               onClick={closeMenu}
             >
@@ -50,7 +50,7 @@ export default function Header({ user }: HeaderProps) {
               {user ? (
                 <>
                   <a
-                    href="/dashboard"
+                    href={withBasePath("/dashboard")}
                     className="text-white/70 hover:text-white font-medium transition-colors text-sm"
                   >
                     Кабинет
@@ -107,7 +107,7 @@ export default function Header({ user }: HeaderProps) {
               <>
                 <p className="px-4 py-2 text-sm text-violet-500 truncate">{user.name}</p>
                 <a
-                  href="/dashboard"
+                  href={withBasePath("/dashboard")}
                   onClick={closeMenu}
                   className="block px-4 py-3 rounded-xl text-slate-800 hover:bg-pink-50 font-medium"
                 >
