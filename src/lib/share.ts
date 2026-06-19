@@ -76,9 +76,12 @@ export async function copyToClipboard(text: string): Promise<boolean> {
 export type ShareResult = "shared" | "aborted" | "fallback";
 
 /** Opens system share sheet with installed apps. */
-export function shareStory(story: StoredStory, onResult?: (result: ShareResult) => void): void {
+export async function shareStory(
+  story: StoredStory,
+  onResult?: (result: ShareResult) => void
+): Promise<void> {
   const text = getStoryShareText(story);
-  const url = buildShareUrl(story);
+  const url = await buildShareUrl(story);
   const title = story.title;
 
   if (!navigator.share) {

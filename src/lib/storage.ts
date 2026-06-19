@@ -36,15 +36,44 @@ export function deleteStory(id: string): void {
   localStorage.setItem(STORIES_KEY, JSON.stringify(stories));
 }
 
-function toBase64Url(value: string): string {
-  return btoa(value).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+function toBase64Url(bytes: Uint8Array): string {
+  let binary = "";
+  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
 }
 
-function fromBase64Url(encoded: string): string {
+function fromBase64Url(encoded: string): Uint8Array {
   let normalized = encoded.replace(/ /g, "+").replace(/-/g, "+").replace(/_/g, "/");
   const pad = normalized.length % 4;
   if (pad) normalized += "=".repeat(4 - pad);
-  return atob(normalized);
+  const binary = atob(normalized);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
+
+function utf8ToBase64Url(value: string): string {
+  return toBase64Url(new TextEncoder().encode(value));
+}
+
+function utf8FromBase64Url(encoded: string): string {
+  return new TextDecoder().decode(fromBase64Url(encoded));
+}
+
+async function gzipCompress(text: string): Promise<string> {
+  const stream = new Blob([new TextEncoder().encode(text)])
+    .stream()
+    .pipeThrough(new CompressionStream("gzip"));
+  const buf = await new Response(stream).arrayBuffer();
+  return toBase64Url(new Uint8Array(buf));
+}
+
+async function gzipDecompress(encoded: string): Promise<string> {
+  const bytes = new Uint8Array(fromBase64Url(encoded));
+  const stream = new Blob([bytes])
+    .stream()
+    .pipeThrough(new DecompressionStream("gzip"));
+  return await new Response(stream).text();
 }
 
 function slimStatsForShare(stats: StoredStory["stats"]) {
@@ -57,8 +86,8 @@ function slimStatsForShare(stats: StoredStory["stats"]) {
   };
 }
 
-export function encodeStoryForShare(story: StoredStory): string {
-  const payload = {
+function sharePayload(story: StoredStory) {
+  return {
     t: story.title,
     p: story.partnerNames,
     s: slimStatsForShare(story.stats),
@@ -68,7 +97,14 @@ export function encodeStoryForShare(story: StoredStory): string {
     f: story.facts,
     c: story.createdAt,
   };
-  return toBase64Url(encodeURIComponent(JSON.stringify(payload)));
+}
+
+export async function encodeStoryForShare(story: StoredStory): Promise<string> {
+  const json = JSON.stringify(sharePayload(story));
+  if (typeof CompressionStream !== "undefined") {
+    return `z${await gzipCompress(json)}`;
+  }
+  return utf8ToBase64Url(json);
 }
 
 const DEFAULT_PUBLIC_URL = "https://abudkina.github.io/LoveStory";
@@ -99,27 +135,56 @@ export function getShareBase(origin?: string): string {
   return DEFAULT_PUBLIC_URL;
 }
 
-export function buildShareUrl(story: StoredStory, origin?: string): string {
-  return `${getShareBase(origin)}/share?d=${encodeStoryForShare(story)}`;
+export async function buildShareUrl(story: StoredStory, origin?: string): Promise<string> {
+  return `${getShareBase(origin)}/share?d=${await encodeStoryForShare(story)}`;
 }
 
-export function decodeStoryFromShare(encoded: string): Partial<StoredStory> | null {
+function storyFromPayload(payload: Record<string, unknown>): Partial<StoredStory> {
+  return {
+    title: payload.t as string,
+    partnerNames: payload.p as [string, string],
+    stats: payload.s as StoredStory["stats"],
+    highlights: (payload.h as StoredStory["highlights"]) ?? [],
+    timeline: (payload.tl as StoredStory["timeline"]) ?? [],
+    quotes: (payload.q as StoredStory["quotes"]) ?? [],
+    facts: (payload.f as StoredStory["facts"]) ?? [],
+    photos: (payload.ph as StoredStory["photos"]) ?? [],
+    createdAt: payload.c as string,
+    id: "shared",
+    userId: "shared",
+    shareId: "shared",
+  };
+}
+
+function decodeLegacyShare(encoded: string): Partial<StoredStory> | null {
   try {
-    const payload = JSON.parse(decodeURIComponent(fromBase64Url(encoded)));
-    return {
-      title: payload.t,
-      partnerNames: payload.p,
-      stats: payload.s,
-      highlights: payload.h ?? [],
-      timeline: payload.tl ?? [],
-      quotes: payload.q ?? [],
-      facts: payload.f ?? [],
-      photos: payload.ph ?? [],
-      createdAt: payload.c,
-      id: "shared",
-      userId: "shared",
-      shareId: "shared",
-    };
+    const legacy = decodeURIComponent(
+      Array.from(fromBase64Url(encoded), (b) => String.fromCharCode(b)).join("")
+    );
+    return storyFromPayload(JSON.parse(legacy));
+  } catch {
+    return null;
+  }
+}
+
+export async function decodeStoryFromShare(
+  encoded: string
+): Promise<Partial<StoredStory> | null> {
+  try {
+    if (encoded.startsWith("z")) {
+      const json =
+        typeof DecompressionStream !== "undefined"
+          ? await gzipDecompress(encoded.slice(1))
+          : null;
+      if (!json) return decodeLegacyShare(encoded);
+      return storyFromPayload(JSON.parse(json));
+    }
+
+    try {
+      return storyFromPayload(JSON.parse(utf8FromBase64Url(encoded)));
+    } catch {
+      return decodeLegacyShare(encoded);
+    }
   } catch {
     return null;
   }

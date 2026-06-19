@@ -13,19 +13,28 @@ function ShareContent() {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    const data = searchParams.get("d");
-    if (!data) {
-      setError(true);
-      return;
-    }
+    const load = async () => {
+      const data =
+        searchParams.get("d") ??
+        (typeof window !== "undefined"
+          ? new URLSearchParams(window.location.hash.slice(1)).get("d")
+          : null);
 
-    const decoded = decodeStoryFromShare(data);
-    if (!decoded || !decoded.stats) {
-      setError(true);
-      return;
-    }
+      if (!data) {
+        setError(true);
+        return;
+      }
 
-    setStory(decoded as StoredStory);
+      const decoded = await decodeStoryFromShare(data);
+      if (!decoded || !decoded.stats) {
+        setError(true);
+        return;
+      }
+
+      setStory(decoded as StoredStory);
+    };
+
+    void load();
   }, [searchParams]);
 
   if (error) {

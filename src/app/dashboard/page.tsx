@@ -11,10 +11,10 @@ import { getUserStories, deleteStory } from "@/lib/storage";
 import { User, StoredStory } from "@/types";
 
 const EXPORT_STEPS = [
-  { emoji: "💬", text: "Откройте чат с партнёром в Telegram Desktop" },
-  { emoji: "⋮", text: "Меню ⋮ → Export chat history" },
-  { emoji: "📄", text: "Выберите формат JSON, без медиафайлов" },
-  { emoji: "📤", text: "Загрузите файл result.json в поле выше" },
+  { emoji: "💬", text: "Откройте чат с партнёром в Telegram Desktop (не веб-версия)" },
+  { emoji: "⋮", text: "Меню ⋮ вверху чата → «Экспорт истории чата»" },
+  { emoji: "📄", text: "Выберите формат HTML. Для фото в истории оставьте медиафайлы" },
+  { emoji: "📤", text: "Загрузите messages.html или перетащите папку экспорта целиком" },
 ];
 
 const STAT_COLORS = [
@@ -128,9 +128,9 @@ export default function DashboardPage() {
                       <span className="text-gradient-rainbow">love story</span>
                     </h2>
                     <p className="text-slate-600 mt-2 leading-relaxed">
-                      Придумайте название и загрузите файл{" "}
-                      <span className="font-semibold text-pink-600">result.json</span>{" "}
-                      из экспорта Telegram.
+                      Придумайте название и загрузите{" "}
+                      <span className="font-semibold text-pink-600">messages.html</span>{" "}
+                      или папку экспорта Telegram.
                     </p>
                   </div>
                 </div>

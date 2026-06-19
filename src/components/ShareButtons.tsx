@@ -20,12 +20,12 @@ export default function ShareButtons({ story }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false);
   const [shareStatus, setShareStatus] = useState("");
 
-  const getShareUrl = () => buildShareUrl(story);
+  const getShareUrl = async () => buildShareUrl(story);
 
   const getShareText = () => getStoryShareText(story);
 
   const handleCopyLink = async () => {
-    const ok = await copyToClipboard(getShareUrl());
+    const ok = await copyToClipboard(await getShareUrl());
     if (ok) {
       setCopied(true);
       setShareStatus("");
@@ -41,12 +41,12 @@ export default function ShareButtons({ story }: ShareButtonsProps) {
     });
   };
 
-  const handleTelegramShare = () => {
-    openTelegramShare(getShareText(), getShareUrl());
+  const handleTelegramShare = async () => {
+    openTelegramShare(getShareText(), await getShareUrl());
   };
 
-  const handleWhatsAppShare = () => {
-    openWhatsAppShare(getShareText(), getShareUrl());
+  const handleWhatsAppShare = async () => {
+    openWhatsAppShare(getShareText(), await getShareUrl());
   };
 
   const handleDownloadHtml = () => {
