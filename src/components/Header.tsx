@@ -22,7 +22,7 @@ export default function Header({ user }: HeaderProps) {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
           <nav className="flex items-center justify-between h-16 md:h-[4.5rem]">
             <Link
-              href={withBasePath("/")}
+              href="/"
               className="font-display text-xl md:text-2xl font-bold min-w-0 truncate group"
               onClick={closeMenu}
             >
