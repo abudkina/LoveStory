@@ -26,13 +26,13 @@ html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
   overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body {
   font-family: var(--font-body);
   background: #0f0a14;
   color: #3d2c2c;
-  overflow-x: hidden;
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
 }

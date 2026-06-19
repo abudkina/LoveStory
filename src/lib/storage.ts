@@ -100,7 +100,7 @@ export function getShareBase(origin?: string): string {
 }
 
 export function buildShareUrl(story: StoredStory, origin?: string): string {
-  return `${getShareBase(origin)}/share/?d=${encodeStoryForShare(story)}`;
+  return `${getShareBase(origin)}/share?d=${encodeStoryForShare(story)}`;
 }
 
 export function decodeStoryFromShare(encoded: string): Partial<StoredStory> | null {

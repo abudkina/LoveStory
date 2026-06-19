@@ -1,16 +1,16 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import LoveStoryView from "@/components/LoveStoryView";
+import { withBasePath } from "@/lib/paths";
 import { getSession } from "@/lib/auth";
 import { getStoryById } from "@/lib/storage";
 import { StoredStory } from "@/types";
 
 function StoryContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const [story, setStory] = useState<StoredStory | null>(null);
   const [ready, setReady] = useState(false);
 
@@ -20,25 +20,25 @@ function StoryContent() {
 
     const id = searchParams.get("id");
     if (!id) {
-      router.replace("/dashboard");
+      window.location.replace(withBasePath("/dashboard"));
       return;
     }
 
     const session = getSession();
     if (!session) {
-      router.replace("/#auth");
+      window.location.replace(withBasePath("/#auth"));
       return;
     }
 
     const found = getStoryById(id);
     if (!found || found.userId !== session.id) {
-      router.replace("/dashboard");
+      window.location.replace(withBasePath("/dashboard"));
       return;
     }
 
     setStory(found);
     setReady(true);
-  }, [searchParams, router]);
+  }, [searchParams]);
 
   if (!ready || !story) {
     return (

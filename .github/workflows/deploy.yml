@@ -32,7 +32,7 @@ jobs:
           GITHUB_PAGES: "true"
           NEXT_PUBLIC_APP_URL: https://abudkina.github.io/LoveStory
 
-      - run: cp out/index.html out/404.html
+      - run: node scripts/prepare-pages.mjs
 
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -34,7 +34,9 @@ export default function ChatUploader({ userId, onStoryCreated }: ChatUploaderPro
       let exportFile = htmlFile ?? findMessagesHtml(allFiles);
 
       if (!exportFile) {
-        throw new Error("Нужен messages.html из экспорта Telegram.");
+        throw new Error(
+          "В папке нет messages.html. Выберите папку экспорта Telegram целиком (там должен быть messages.html и photos/)."
+        );
       }
 
       let content = await exportFile.text();
@@ -44,15 +46,20 @@ export default function ChatUploader({ userId, onStoryCreated }: ChatUploaderPro
       let missingPhotos = extractPhotoMessages(exportData).length - photos.length;
 
       if (missingPhotos > 0) {
-        const folderFiles = await pickExportFolderFiles().catch(() => [] as File[]);
-        if (folderFiles.length > 0) {
-          allFiles = [...allFiles, ...folderFiles];
-          exportFile = findMessagesHtml(allFiles) ?? exportFile;
-          content = await exportFile.text();
-          exportData = parseTelegramFile(content);
-          fileIndex = indexUploadFiles(allFiles);
-          photos = await resolveStoryPhotos(exportData, fileIndex);
-          missingPhotos = extractPhotoMessages(exportData).length - photos.length;
+        const fromFolder = allFiles.some(
+          (f) => (f as File & { webkitRelativePath?: string }).webkitRelativePath
+        );
+        if (!fromFolder) {
+          const folderFiles = await pickExportFolderFiles().catch(() => [] as File[]);
+          if (folderFiles.length > 0) {
+            allFiles = [...allFiles, ...folderFiles];
+            exportFile = findMessagesHtml(allFiles) ?? exportFile;
+            content = await exportFile.text();
+            exportData = parseTelegramFile(content);
+            fileIndex = indexUploadFiles(allFiles);
+            photos = await resolveStoryPhotos(exportData, fileIndex);
+            missingPhotos = extractPhotoMessages(exportData).length - photos.length;
+          }
         }
       }
 
@@ -85,9 +92,19 @@ export default function ChatUploader({ userId, onStoryCreated }: ChatUploaderPro
 
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setDragging(false);
-    const files = await collectDroppedFiles(e.dataTransfer);
-    if (files.length) processFiles(files);
+
+    try {
+      const files = await collectDroppedFiles(e.dataTransfer);
+      if (!files.length) {
+        setError("Не удалось прочитать папку. Нажмите «выбрать папку экспорта» или загрузите messages.html.");
+        return;
+      }
+      await processFiles(files);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Не удалось обработать файлы из папки.");
+    }
   };
 
   const handleHtmlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,9 +113,23 @@ export default function ChatUploader({ userId, onStoryCreated }: ChatUploaderPro
     e.target.value = "";
   };
 
+  const handlePickFolder = async () => {
+    setError("");
+    try {
+      const files = await pickExportFolderFiles();
+      if (files.length) {
+        await processFiles(files);
+        return;
+      }
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
+    }
+    folderRef.current?.click();
+  };
+
   const handleFolderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
-    if (files.length) processFiles(files);
+    if (files.length) void processFiles(files);
     e.target.value = "";
   };
 
@@ -113,11 +144,20 @@ export default function ChatUploader({ userId, onStoryCreated }: ChatUploaderPro
       />
 
       <div
-        onDragOver={(e) => {
+        onDragEnter={(e) => {
           e.preventDefault();
           setDragging(true);
         }}
-        onDragLeave={() => setDragging(false)}
+        onDragOver={(e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = "copy";
+          setDragging(true);
+        }}
+        onDragLeave={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+            setDragging(false);
+          }
+        }}
         onDrop={handleDrop}
         onClick={() => !loading && htmlRef.current?.click()}
         className={`relative rounded-2xl border-2 border-dashed p-8 sm:p-12 text-center cursor-pointer transition-all touch-manipulation overflow-hidden ${
@@ -138,8 +178,10 @@ export default function ChatUploader({ userId, onStoryCreated }: ChatUploaderPro
           ref={folderRef}
           type="file"
           multiple
-          // @ts-expect-error webkitdirectory is non-standard but widely supported
+          // @ts-expect-error non-standard directory picker attributes
           webkitdirectory=""
+          directory=""
+          mozdirectory=""
           onChange={handleFolderChange}
           className="hidden"
         />
@@ -174,7 +216,7 @@ export default function ChatUploader({ userId, onStoryCreated }: ChatUploaderPro
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                folderRef.current?.click();
+                void handlePickFolder();
               }}
               className="mt-4 text-xs text-rose-500 underline underline-offset-2 hover:text-rose-700"
             >

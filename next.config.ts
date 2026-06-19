@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
   basePath,
   assetPrefix: basePath ? `${basePath}/` : undefined,
   images: { unoptimized: true },
-  trailingSlash: true,
+  trailingSlash: false,
   devIndicators: false,
   env: {
     NEXT_PUBLIC_BASE_PATH: basePath,
