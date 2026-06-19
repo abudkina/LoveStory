@@ -9,6 +9,7 @@ import {
   pickExportFolderFiles,
 } from "@/lib/exportFiles";
 import { saveStory } from "@/lib/storage";
+import { generateId } from "@/lib/id";
 import { StoredStory } from "@/types";
 
 interface ChatUploaderProps {
@@ -60,7 +61,7 @@ export default function ChatUploader({ userId, onStoryCreated }: ChatUploaderPro
 
       const stored: StoredStory = {
         ...story,
-        shareId: crypto.randomUUID().slice(0, 8),
+        shareId: generateId().slice(0, 8),
       };
 
       saveStory(stored);

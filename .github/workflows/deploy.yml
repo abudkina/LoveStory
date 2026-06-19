@@ -30,6 +30,7 @@ jobs:
       - run: npm run build
         env:
           GITHUB_PAGES: "true"
+          NEXT_PUBLIC_APP_URL: https://abudkina.github.io/LoveStory
 
       - run: cp out/index.html out/404.html
 

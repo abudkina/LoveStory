@@ -71,9 +71,36 @@ export function encodeStoryForShare(story: StoredStory): string {
   return toBase64Url(encodeURIComponent(JSON.stringify(payload)));
 }
 
+const DEFAULT_PUBLIC_URL = "https://abudkina.github.io/LoveStory";
+
+function isLocalHostname(hostname: string): boolean {
+  if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "[::1]") return true;
+  if (/^10\./.test(hostname)) return true;
+  if (/^192\.168\./.test(hostname)) return true;
+  if (/^172\.(1[6-9]|2\d|3[01])\./.test(hostname)) return true;
+  return false;
+}
+
+export function getShareBase(origin?: string): string {
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+  const envUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "");
+
+  if (origin) return `${origin.replace(/\/$/, "")}${basePath}`;
+
+  if (envUrl) return envUrl;
+
+  if (typeof window !== "undefined") {
+    const { origin: pageOrigin, hostname } = window.location;
+    if (!isLocalHostname(hostname)) {
+      return `${pageOrigin.replace(/\/$/, "")}${basePath}`;
+    }
+  }
+
+  return DEFAULT_PUBLIC_URL;
+}
+
 export function buildShareUrl(story: StoredStory, origin?: string): string {
-  const base = origin ?? (typeof window !== "undefined" ? window.location.origin : "");
-  return `${base}/share?d=${encodeStoryForShare(story)}`;
+  return `${getShareBase(origin)}/share/?d=${encodeStoryForShare(story)}`;
 }
 
 export function decodeStoryFromShare(encoded: string): Partial<StoredStory> | null {

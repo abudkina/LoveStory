@@ -2,6 +2,13 @@
 
 import { useState } from "react";
 import { buildShareUrl } from "@/lib/storage";
+import {
+  copyToClipboard,
+  getStoryShareText,
+  openTelegramShare,
+  openWhatsAppShare,
+  shareStory,
+} from "@/lib/share";
 import { buildStoryHtml } from "@/lib/storyHtmlTemplate";
 import { StoredStory } from "@/types";
 
@@ -15,51 +22,31 @@ export default function ShareButtons({ story }: ShareButtonsProps) {
 
   const getShareUrl = () => buildShareUrl(story);
 
-  const getShareText = () => {
-    const [n1, n2] = story.partnerNames;
-    return `${story.title} 💕 ${n1} & ${n2} — ${story.stats.totalMessages} сообщений за ${story.stats.daysTogether} дней`;
-  };
+  const getShareText = () => getStoryShareText(story);
 
   const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(getShareUrl());
+    const ok = await copyToClipboard(getShareUrl());
+    if (ok) {
       setCopied(true);
+      setShareStatus("");
       setTimeout(() => setCopied(false), 2500);
-    } catch {
+    } else {
       setShareStatus("Не удалось скопировать");
     }
   };
 
-  const handleNativeShare = async () => {
-    const url = getShareUrl();
-    if (!url) return;
-
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: story.title, url });
-        setShareStatus("Поделились!");
-      } catch (err) {
-        if (err instanceof Error && err.name === "AbortError") return;
-        await handleCopyLink();
-      }
-    } else {
-      await handleCopyLink();
-    }
+  const handleNativeShare = () => {
+    shareStory(story, (result) => {
+      if (result === "shared") setShareStatus("Поделились!");
+    });
   };
 
   const handleTelegramShare = () => {
-    const url = encodeURIComponent(getShareUrl());
-    const text = encodeURIComponent(getShareText());
-    window.open(
-      `https://t.me/share/url?url=${url}&text=${text}`,
-      "_blank",
-      "noopener,noreferrer"
-    );
+    openTelegramShare(getShareText(), getShareUrl());
   };
 
   const handleWhatsAppShare = () => {
-    const text = encodeURIComponent(`${getShareText()}\n${getShareUrl()}`);
-    window.open(`https://wa.me/?text=${text}`, "_blank", "noopener,noreferrer");
+    openWhatsAppShare(getShareText(), getShareUrl());
   };
 
   const handleDownloadHtml = () => {

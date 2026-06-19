@@ -9,6 +9,7 @@ import {
   StoryFact,
   StoryPhoto,
 } from "@/types";
+import { generateId } from "@/lib/id";
 
 const SWEET_WORDS = [
   "люблю",
@@ -386,7 +387,7 @@ export function generateLoveStory(
   }
 
   return {
-    id: crypto.randomUUID(),
+    id: generateId(),
     userId,
     title,
     partnerNames: names,

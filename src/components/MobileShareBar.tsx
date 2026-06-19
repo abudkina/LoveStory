@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { buildShareUrl } from "@/lib/storage";
+import { shareStory } from "@/lib/share";
 import { StoredStory } from "@/types";
 
 interface MobileShareBarProps {
@@ -9,35 +9,15 @@ interface MobileShareBarProps {
 }
 
 export default function MobileShareBar({ story }: MobileShareBarProps) {
-  const [copied, setCopied] = useState(false);
+  const [opened, setOpened] = useState(false);
 
-  const getShareUrl = () => buildShareUrl(story);
-
-  const getShareText = () => {
-    const [n1, n2] = story.partnerNames;
-    return `${story.title} 💕 ${n1} & ${n2}`;
-  };
-
-  const handleShare = async () => {
-    const url = getShareUrl();
-    if (!url) return;
-
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: story.title, url });
-        return;
-      } catch (err) {
-        if (err instanceof Error && err.name === "AbortError") return;
+  const handleShare = () => {
+    shareStory(story, (result) => {
+      if (result === "fallback") {
+        setOpened(true);
+        setTimeout(() => setOpened(false), 2000);
       }
-    }
-
-    try {
-      await navigator.clipboard.writeText(`${getShareText()}\n${url}`);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      /* ignore */
-    }
+    });
   };
 
   return (
@@ -48,7 +28,7 @@ export default function MobileShareBar({ story }: MobileShareBarProps) {
           className="btn-primary flex-1 py-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2"
         >
           <span>📤</span>
-          {copied ? "Скопировано!" : "Поделиться"}
+          {opened ? "Открыто!" : "Поделиться"}
         </button>
         <a
           href="#share-full"

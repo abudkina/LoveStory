@@ -1,4 +1,5 @@
 import { User } from "@/types";
+import { generateId } from "@/lib/id";
 
 const USERS_KEY = "love_story_users";
 const SESSION_KEY = "love_story_session";
@@ -34,7 +35,7 @@ export function register(
   }
 
   const user: User = {
-    id: crypto.randomUUID(),
+    id: generateId(),
     email: normalizedEmail,
     name: name.trim(),
   };
