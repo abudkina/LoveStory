@@ -140,7 +140,7 @@ export default function LandingPage() {
     window.location.href = withBasePath("/dashboard");
   };
 
-  const startHref = user ? "/dashboard" : "#auth";
+  const startHref = user ? withBasePath("/dashboard") : "#auth";
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -475,7 +475,7 @@ export default function LandingPage() {
                       Продолжите создавать вашу love story
                     </p>
                     <a
-                      href="/dashboard"
+                      href={withBasePath("/dashboard")}
                       className="btn-glow inline-block w-full py-3.5 rounded-xl font-bold text-base"
                     >
                       Перейти в кабинет ✦
