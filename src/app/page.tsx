@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import FloatingHearts from "@/components/FloatingHearts";
 import AuthForm from "@/components/AuthForm";
 import { getSession } from "@/lib/auth";
+import { withBasePath } from "@/lib/paths";
 import { User } from "@/types";
 
 const STEPS = [
@@ -136,7 +137,7 @@ export default function LandingPage() {
   }, []);
 
   const handleAuthSuccess = () => {
-    window.location.href = "/dashboard";
+    window.location.href = withBasePath("/dashboard");
   };
 
   const startHref = user ? "/dashboard" : "#auth";

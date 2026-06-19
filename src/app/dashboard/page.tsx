@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import ChatUploader from "@/components/ChatUploader";
 import FloatingHearts from "@/components/FloatingHearts";
 import { getSession } from "@/lib/auth";
+import { withBasePath } from "@/lib/paths";
 import { getUserStories, deleteStory } from "@/lib/storage";
 import { User, StoredStory } from "@/types";
 
@@ -39,7 +40,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const session = getSession();
     if (!session) {
-      window.location.href = "/#auth";
+      window.location.href = withBasePath("/#auth");
       return;
     }
     setUser(session);
@@ -69,10 +70,10 @@ export default function DashboardPage() {
   const maxDays = stories.length > 0 ? Math.max(...stories.map((s) => s.stats.daysTogether)) : 0;
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Header user={user} />
 
-      <main className="min-h-screen">
+      <main className="flex-1">
         {/* Hero */}
         <section className="relative mesh-hero mesh-hero-to-light mesh-animated pt-10 pb-20 sm:pt-14 sm:pb-24 overflow-hidden">
           <div className="aurora-orb w-72 h-72 bg-pink-500/25 top-0 left-[10%]" />
@@ -241,6 +242,6 @@ export default function DashboardPage() {
           </div>
         </section>
       </main>
-    </>
+    </div>
   );
 }

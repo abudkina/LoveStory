@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { logout } from "@/lib/auth";
+import { withBasePath } from "@/lib/paths";
 import { User } from "@/types";
 
 interface HeaderProps {
@@ -58,7 +59,7 @@ export default function Header({ user }: HeaderProps) {
                   <button
                     onClick={() => {
                       logout();
-                      window.location.href = "/";
+                      window.location.href = withBasePath("/");
                     }}
                     className="text-white/50 hover:text-white text-sm transition-colors"
                   >
@@ -115,7 +116,7 @@ export default function Header({ user }: HeaderProps) {
                 <button
                   onClick={() => {
                     logout();
-                    window.location.href = "/";
+                    window.location.href = withBasePath("/");
                   }}
                   className="w-full text-left px-4 py-3 rounded-xl text-pink-600 hover:bg-pink-50"
                 >
